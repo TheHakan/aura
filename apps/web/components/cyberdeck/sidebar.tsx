@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { signOut, useSession } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
 import {
   Youtube,
@@ -16,6 +17,8 @@ import {
   Zap,
   Settings,
   LogOut,
+  UserCircle2,
+  LogIn,
 } from "lucide-react";
 
 const modules = [
@@ -77,6 +80,13 @@ const modules = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { data: session } = useSession();
+
+  async function handleLogout() {
+    await signOut();
+    router.push("/login");
+  }
 
   return (
     <aside className="fixed left-0 top-0 h-full w-16 lg:w-56 flex flex-col border-r border-[var(--cyber-border)] bg-[var(--cyber-surface)] z-50">
@@ -123,17 +133,48 @@ export function Sidebar() {
 
       {/* Bottom */}
       <div className="border-t border-[var(--cyber-border)] px-2 py-3 space-y-1">
+        {/* User info / guest chip */}
+        {session?.user ? (
+          <div className="flex items-center gap-2 px-3 py-2 mb-1">
+            <div className="w-5 h-5 rounded-full bg-[rgba(0,255,136,0.15)] border border-[rgba(0,255,136,0.3)] flex items-center justify-center text-[9px] font-mono font-bold text-[var(--cyber-green)] flex-shrink-0">
+              {(session.user.name ??
+                session.user.email ??
+                "?")[0].toUpperCase()}
+            </div>
+            <span
+              className="hidden lg:block text-[10px] font-mono text-[var(--cyber-text-dim)] truncate max-w-[110px]"
+              title={session.user.name ?? session.user.email ?? ""}
+            >
+              {session.user.name ?? session.user.email}
+            </span>
+          </div>
+        ) : (
+          <Link
+            href={`/login?next=${encodeURIComponent(pathname)}`}
+            className="flex items-center gap-3 px-3 py-2 rounded text-xs font-mono text-[var(--cyber-green)] border border-[rgba(0,255,136,0.3)] hover:bg-[rgba(0,255,136,0.08)] transition-all duration-150"
+          >
+            <LogIn size={14} className="flex-shrink-0" />
+            <span className="hidden lg:block">SIGN IN</span>
+          </Link>
+        )}
+
         <Link
-          href="/settings"
+          href="/settings/ai"
           className="flex items-center gap-3 px-3 py-2 rounded text-xs font-mono text-[var(--cyber-text-dim)] hover:text-[var(--cyber-text)] hover:bg-[var(--cyber-dim)] transition-all duration-150"
         >
           <Settings size={16} className="flex-shrink-0" />
           <span className="hidden lg:block">SETTINGS</span>
         </Link>
-        <button className="w-full flex items-center gap-3 px-3 py-2 rounded text-xs font-mono text-[var(--cyber-text-dim)] hover:text-[var(--cyber-red)] hover:bg-[rgba(255,45,85,0.1)] transition-all duration-150">
-          <LogOut size={16} className="flex-shrink-0" />
-          <span className="hidden lg:block">LOGOUT</span>
-        </button>
+
+        {session?.user && (
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded text-xs font-mono text-[var(--cyber-text-dim)] hover:text-[var(--cyber-red)] hover:bg-[rgba(255,45,85,0.1)] transition-all duration-150"
+          >
+            <LogOut size={16} className="flex-shrink-0" />
+            <span className="hidden lg:block">LOGOUT</span>
+          </button>
+        )}
       </div>
     </aside>
   );
