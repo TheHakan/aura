@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { TerminalWindow } from "@/components/cyberdeck/terminal-window";
 import { CyberButton } from "@/components/cyberdeck/cyber-button";
 import { Send, Bot, User } from "lucide-react";
+import { GuestBanner } from "@/components/cyberdeck/auth-gate";
 
 interface Message {
   role: "user" | "assistant";
@@ -63,6 +64,7 @@ export default function AgentPage() {
 
   return (
     <div className="space-y-4 h-[calc(100vh-8rem)] flex flex-col">
+      <GuestBanner message="You're in guest mode — sign in to save agent sessions and tool permissions." />
       <div>
         <h1 className="text-xl font-bold tracking-widest text-[var(--cyber-green)] uppercase">
           ▸ AGENT
