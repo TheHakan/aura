@@ -27,5 +27,24 @@ services:
       timeout: 5s
       retries: 5
 
+  # Local LLM — fully offline AI (no API keys needed)
+  # After first start, pull a model: docker exec aura-ollama ollama pull llama3.2
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    # Uncomment to enable GPU acceleration (requires nvidia-container-toolkit):
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
 volumes:
   postgres_dev_data:
+  ollama_data:
