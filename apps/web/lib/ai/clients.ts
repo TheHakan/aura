@@ -33,22 +33,30 @@ export const DEFAULT_OPENAI_MODEL = "gpt-4o";
 // ─── Unified model selector ───────────────────────────────────────────────────
 // Priority: Ollama (local) → Anthropic → OpenAI → Groq
 // Returns the model and a label so routes can log which backend is active.
-export function getModel(
-  userAnthropicKey?: string,
-  userOpenAIKey?: string,
-): { model: LanguageModelV1; backend: string } {
-  const ollamaURL = process.env["OLLAMA_BASE_URL"];
-  const anthropicKey = userAnthropicKey ?? process.env["ANTHROPIC_API_KEY"];
-  const openaiKey = userOpenAIKey ?? process.env["OPENAI_API_KEY"];
-  const groqKey = process.env["GROQ_API_KEY"];
+
+export interface UserAiSettings {
+  anthropicKey?: string;
+  openaiKey?: string;
+  groqKey?: string;
+  ollamaBaseUrl?: string;
+  ollamaModel?: string;
+}
+
+export function getModelFromSettings(s: UserAiSettings = {}): {
+  model: LanguageModelV1;
+  backend: string;
+} {
+  const ollamaURL = s.ollamaBaseUrl ?? process.env["OLLAMA_BASE_URL"];
+  const anthropicKey = s.anthropicKey ?? process.env["ANTHROPIC_API_KEY"];
+  const openaiKey = s.openaiKey ?? process.env["OPENAI_API_KEY"];
+  const groqKey = s.groqKey ?? process.env["GROQ_API_KEY"];
+  const ollamaModel =
+    s.ollamaModel ?? process.env["OLLAMA_MODEL"] ?? DEFAULT_OLLAMA_MODEL;
 
   // 1. Local Ollama — works fully offline
   if (ollamaURL || (!anthropicKey && !openaiKey && !groqKey)) {
     const client = getOllamaClient(ollamaURL);
-    return {
-      model: client(DEFAULT_OLLAMA_MODEL),
-      backend: `ollama:${DEFAULT_OLLAMA_MODEL}`,
-    };
+    return { model: client(ollamaModel), backend: `ollama:${ollamaModel}` };
   }
 
   // 2. Anthropic (cloud)
@@ -78,6 +86,17 @@ export function getModel(
     model: groqClient("llama-3.3-70b-versatile"),
     backend: "groq:llama-3.3-70b-versatile",
   };
+}
+
+// Kept for backward compatibility with existing call sites
+export function getModel(
+  userAnthropicKey?: string,
+  userOpenAIKey?: string,
+): { model: LanguageModelV1; backend: string } {
+  return getModelFromSettings({
+    anthropicKey: userAnthropicKey,
+    openaiKey: userOpenAIKey,
+  });
 }
 
 /** @deprecated Use getModel() instead */
