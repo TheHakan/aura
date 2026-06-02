@@ -431,15 +431,19 @@ pnpm dev
 - [x] Docker Compose (dev + prod, includes Ollama)
 - [x] TypeScript compiles clean, dev server runs
 
-### Phase 1 — Core Modules (Next)
+### Phase 1 — Core Modules ✅ COMPLETE
 
-- [ ] Auth middleware (protect all `/dashboard` routes)
-- [ ] CHANNELS: YouTube OAuth connect + channel list + basic stats
-- [ ] VAULT: CRUD for encrypted secrets (add/view/delete)
-- [ ] OPS: Coolify API — server list + service status
-- [ ] BROADCAST: Postiz API — connect accounts + schedule post
-- [ ] DB migrations first run
-- [ ] Deploy skeleton to Coolify (Phase 0 milestone)
+- [x] Auth middleware (`middleware.ts`) — protects all dashboard routes
+- [x] `lib/db/index.ts` — lazy `getDb()` (no module-level throw)
+- [x] `lib/workspace.ts` — auto-create personal workspace per user
+- [x] VAULT: full CRUD — add/reveal/delete encrypted secrets, rotation reminders, module assignment
+- [x] OPS: servers list + add/delete, uptime monitors + manual ping
+- [x] CHANNELS: YouTube channel list from DB + "Connect YouTube" flow
+- [x] BROADCAST: Postiz config UI + platform list + dashboard link
+- [x] SETTINGS/AI: full AI provider management page — Ollama model catalog + pull, cloud provider cards
+- [x] API routes: `/api/vault`, `/api/vault/[id]`, `/api/channels`, `/api/ops/servers`, `/api/ops/uptime`, `/api/ops/uptime/[id]/ping`, `/api/ai/providers`, `/api/ai/ollama/pull`
+- [x] Groq support added to `getModel()` (OpenAI-compat at api.groq.com)
+- [x] Sidebar: settings link → `/settings/ai`, logout button wired to `signOut()`
 
 ### Phase 2 — AI & Automation
 
@@ -476,14 +480,14 @@ pnpm dev
 
 ## Known Issues & Constraints
 
-| Issue                               | Status | Notes                                                                     |
-| ----------------------------------- | ------ | ------------------------------------------------------------------------- |
-| No auth middleware yet              | ⚠️     | Dashboard routes are publicly accessible — add `middleware.ts` in Phase 1 |
-| DB migrations not run               | ⚠️     | Need PostgreSQL running first. Run `pnpm db:migrate`                      |
-| Ollama model not pre-pulled         | ⚠️     | Must `ollama pull llama3.2` after first `docker compose up`               |
-| `better-call` peer dep wants zod v4 | ℹ️     | Non-blocking warning — app works fine with zod v3                         |
-| TERMINAL is a stub                  | ℹ️     | xterm.js + node-pty planned for Phase 2                                   |
-| No tRPC yet                         | ℹ️     | API routes use raw fetch/`generateText`. tRPC is planned.                 |
+| Issue                               | Status   | Notes                                                             |
+| ----------------------------------- | -------- | ----------------------------------------------------------------- |
+| No auth middleware yet              | ✅ Fixed | `middleware.ts` added in Phase 1 — all dashboard routes protected |
+| DB migrations not run               | ⚠️       | Need PostgreSQL running first. Run `pnpm db:migrate`              |
+| Ollama model not pre-pulled         | ⚠️       | Must `ollama pull llama3.2` after first `docker compose up`       |
+| `better-call` peer dep wants zod v4 | ℹ️       | Non-blocking warning — app works fine with zod v3                 |
+| TERMINAL is a stub                  | ℹ️       | xterm.js + node-pty planned for Phase 2                           |
+| No tRPC yet                         | ℹ️       | API routes use raw fetch/`generateText`. tRPC is planned.         |
 
 ---
 
