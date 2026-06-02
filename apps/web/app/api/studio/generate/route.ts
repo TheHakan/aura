@@ -1,13 +1,13 @@
 import { generateText } from "ai";
-import { getModel } from "@/lib/ai/clients";
+import { getModelForUser } from "@/lib/ai/server";
 import { NextResponse } from "next/server";
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth/server";
 
 export async function POST(req: Request) {
   try {
     const body = (await req.json()) as {
       prompt?: string;
-      anthropicKey?: string;
-      openaiKey?: string;
     };
     const prompt = body.prompt?.trim();
 
@@ -18,7 +18,8 @@ export async function POST(req: Request) {
       );
     }
 
-    const { model, backend } = getModel(body.anthropicKey, body.openaiKey);
+    const session = await auth.api.getSession({ headers: await headers() });
+    const { model, backend } = await getModelForUser(session?.user?.id);
     const { text } = await generateText({
       model,
       system:
