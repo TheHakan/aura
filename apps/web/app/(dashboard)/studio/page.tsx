@@ -4,6 +4,7 @@ import { useState } from "react";
 import { TerminalWindow } from "@/components/cyberdeck/terminal-window";
 import { CyberButton } from "@/components/cyberdeck/cyber-button";
 import { Sparkles, Send } from "lucide-react";
+import { GuestBanner } from "@/components/cyberdeck/auth-gate";
 
 const TEMPLATES = [
   {
@@ -54,6 +55,7 @@ export default function StudioPage() {
 
   return (
     <div className="space-y-6">
+      <GuestBanner message="You're in guest mode — sign in to save chat history and sync across devices." />
       <div>
         <h1 className="text-xl font-bold tracking-widest text-[var(--cyber-green)] uppercase">
           ▸ STUDIO
