@@ -1,10 +1,16 @@
 import { generateText } from "ai";
-import { getAnthropicClient, DEFAULT_MODEL } from "@/lib/ai/clients";
+import { getModel } from "@/lib/ai/clients";
 import { NextResponse } from "next/server";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
+}
+
+interface RequestBody {
+  messages?: Message[];
+  anthropicKey?: string;
+  openaiKey?: string;
 }
 
 const SYSTEM_PROMPT = `You are AURA, an AI command center for content creators and developers.
@@ -25,22 +31,22 @@ Be concise, technical, and helpful. Use terminal-style formatting when appropria
 
 export async function POST(req: Request) {
   try {
-    const body = (await req.json()) as { messages?: Message[] };
+    const body = (await req.json()) as RequestBody;
     const messages = body.messages ?? [];
 
     if (!messages.length) {
       return NextResponse.json({ error: "Messages required" }, { status: 400 });
     }
 
-    const anthropic = getAnthropicClient();
+    const { model, backend } = getModel(body.anthropicKey, body.openaiKey);
     const { text } = await generateText({
-      model: anthropic(DEFAULT_MODEL),
+      model,
       system: SYSTEM_PROMPT,
       messages: messages.map((m) => ({ role: m.role, content: m.content })),
       maxTokens: 2048,
     });
 
-    return NextResponse.json({ text });
+    return NextResponse.json({ text, backend });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Agent request failed";
     return NextResponse.json({ error: message }, { status: 500 });
