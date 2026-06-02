@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface StatusBarProps {
@@ -17,8 +18,18 @@ const statusColors = {
   err: "text-[var(--cyber-red)]",
 };
 
+function useTime() {
+  const [time, setTime] = useState<string>("");
+  useEffect(() => {
+    const fmt = () => new Date().toLocaleTimeString("en-US", { hour12: false });
+    const id = setInterval(() => setTime(fmt()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  return time;
+}
+
 export function StatusBar({ items, className }: StatusBarProps) {
-  const now = new Date().toLocaleTimeString("en-US", { hour12: false });
+  const now = useTime();
 
   return (
     <div
