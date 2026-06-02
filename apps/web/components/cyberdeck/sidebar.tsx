@@ -77,7 +77,7 @@ const modules = [
     color: "text-[var(--cyber-green)]",
   },
 ];
-
+  
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
