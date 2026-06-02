@@ -1,6 +1,8 @@
 import { generateText } from "ai";
-import { getModel } from "@/lib/ai/clients";
+import { getModelForUser } from "@/lib/ai/server";
 import { NextResponse } from "next/server";
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth/server";
 
 interface Message {
   role: "user" | "assistant";
@@ -9,8 +11,6 @@ interface Message {
 
 interface RequestBody {
   messages?: Message[];
-  anthropicKey?: string;
-  openaiKey?: string;
 }
 
 const SYSTEM_PROMPT = `You are AURA, an AI command center for content creators and developers.
@@ -38,7 +38,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Messages required" }, { status: 400 });
     }
 
-    const { model, backend } = getModel(body.anthropicKey, body.openaiKey);
+    const session = await auth.api.getSession({ headers: await headers() });
+    const { model, backend } = await getModelForUser(session?.user?.id);
     const { text } = await generateText({
       model,
       system: SYSTEM_PROMPT,
