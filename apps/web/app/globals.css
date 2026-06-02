@@ -1,0 +1,145 @@
+@import "tailwindcss";
+
+:root {
+  --cyber-bg: #0a0a0f;
+  --cyber-surface: #0f0f1a;
+  --cyber-surface-2: #141428;
+  --cyber-border: #1a1a2e;
+  --cyber-border-2: #252545;
+  --cyber-green: #00ff88;
+  --cyber-green-dim: #00cc6a;
+  --cyber-cyan: #00d4ff;
+  --cyber-purple: #7b2fff;
+  --cyber-red: #ff2d55;
+  --cyber-yellow: #ffcc00;
+  --cyber-dim: #2a2a3e;
+  --cyber-muted: #4a4a6a;
+  --cyber-text: #c8d8e8;
+  --cyber-text-dim: #7a8a9a;
+}
+
+@theme inline {
+  --color-background: var(--cyber-bg);
+  --color-foreground: var(--cyber-text);
+  --font-mono: var(--font-geist-mono), "JetBrains Mono", "Fira Code", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--cyber-bg);
+  color: var(--cyber-text);
+  font-family: var(--font-mono), monospace;
+  background-image:
+    linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+  min-height: 100vh;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--cyber-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--cyber-border-2);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cyber-muted);
+}
+
+/* Selection */
+::selection {
+  background: rgba(0, 255, 136, 0.2);
+  color: var(--cyber-green);
+}
+
+/* Glow effects */
+.glow-green {
+  text-shadow:
+    0 0 10px rgba(0, 255, 136, 0.6),
+    0 0 20px rgba(0, 255, 136, 0.3);
+}
+.glow-cyan {
+  text-shadow:
+    0 0 10px rgba(0, 212, 255, 0.6),
+    0 0 20px rgba(0, 212, 255, 0.3);
+}
+.border-glow-green {
+  box-shadow:
+    0 0 0 1px rgba(0, 255, 136, 0.3),
+    inset 0 0 20px rgba(0, 255, 136, 0.05);
+}
+.border-glow-cyan {
+  box-shadow:
+    0 0 0 1px rgba(0, 212, 255, 0.3),
+    inset 0 0 20px rgba(0, 212, 255, 0.05);
+}
+
+/* Terminal cursor */
+.cursor-blink::after {
+  content: "▋";
+  animation: blink 1s step-end infinite;
+  color: var(--cyber-green);
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes scan {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100vh);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Status indicator */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.status-dot.online {
+  background: var(--cyber-green);
+  box-shadow: 0 0 6px var(--cyber-green);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+.status-dot.offline {
+  background: var(--cyber-red);
+  box-shadow: 0 0 6px var(--cyber-red);
+}
+.status-dot.pending {
+  background: var(--cyber-yellow);
+  box-shadow: 0 0 6px var(--cyber-yellow);
+}
