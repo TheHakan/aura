@@ -31,7 +31,7 @@ export const DEFAULT_ANTHROPIC_MODEL = "claude-sonnet-4-20250514";
 export const DEFAULT_OPENAI_MODEL = "gpt-4o";
 
 // ─── Unified model selector ───────────────────────────────────────────────────
-// Priority: Ollama (local) → Anthropic → OpenAI
+// Priority: Ollama (local) → Anthropic → OpenAI → Groq
 // Returns the model and a label so routes can log which backend is active.
 export function getModel(
   userAnthropicKey?: string,
@@ -40,9 +40,10 @@ export function getModel(
   const ollamaURL = process.env["OLLAMA_BASE_URL"];
   const anthropicKey = userAnthropicKey ?? process.env["ANTHROPIC_API_KEY"];
   const openaiKey = userOpenAIKey ?? process.env["OPENAI_API_KEY"];
+  const groqKey = process.env["GROQ_API_KEY"];
 
   // 1. Local Ollama — works fully offline
-  if (ollamaURL || (!anthropicKey && !openaiKey)) {
+  if (ollamaURL || (!anthropicKey && !openaiKey && !groqKey)) {
     const client = getOllamaClient(ollamaURL);
     return {
       model: client(DEFAULT_OLLAMA_MODEL),
@@ -60,10 +61,22 @@ export function getModel(
   }
 
   // 3. OpenAI (cloud)
-  const client = getOpenAIClient(openaiKey!);
+  if (openaiKey) {
+    const client = getOpenAIClient(openaiKey);
+    return {
+      model: client(DEFAULT_OPENAI_MODEL),
+      backend: `openai:${DEFAULT_OPENAI_MODEL}`,
+    };
+  }
+
+  // 4. Groq (fast cloud inference, OpenAI-compatible)
+  const groqClient = createOpenAI({
+    baseURL: "https://api.groq.com/openai/v1",
+    apiKey: groqKey!,
+  });
   return {
-    model: client(DEFAULT_OPENAI_MODEL),
-    backend: `openai:${DEFAULT_OPENAI_MODEL}`,
+    model: groqClient("llama-3.3-70b-versatile"),
+    backend: "groq:llama-3.3-70b-versatile",
   };
 }
 
